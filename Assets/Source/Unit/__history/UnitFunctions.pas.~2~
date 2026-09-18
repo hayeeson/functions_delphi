@@ -1,0 +1,123 @@
+unit UnitFunctions;
+
+interface
+
+const
+  UltimoDoMes: array [1 .. 12] of integer = (31, 28, 31, 30, 31, 30, 31, 31, 30,
+    31, 30, 31);
+
+  // --PARAMETROS TIPO MODAL-----------------------------------------------------
+  MODAL_TEXT = 0;
+  MODAL_ALERT = 1;
+  MODAL_SUCCESS = 2;
+  MODAL_ERROR = 3;
+  MODAL_INFO = 4;
+  MODAL_CONFIRM = 5;
+  MODAL_SN = 6;
+  MODAL_BAR = 7;
+  MODAL_ERROR_NA = 8;
+  MODAL_ALERT_NA = 9;
+
+  // --PARAMETROS TIPO TOAST-----------------------------------------------------
+  TOAST_TEXT = 0;
+  TOAST_ALERT = 1;
+  TOAST_SUCCESS = 2;
+  TOAST_ERROR = 3;
+  TOAST_INFO = 4;
+
+type
+  GridAuxiliar = class(TStringGrid);
+
+  TCheckListOperacao = (osMarcarTodos, osDesmarcarTodos, osInverter);
+
+  TObjectId = class(TComponent)
+  public
+    Id: integer;
+  end;
+
+  TTravaFinanceiro = (tfNaoTrava, tfConciliacao, tfDataServidor,
+    tfConciliacaoAdiantada);
+  THackTextControl = class(TControl);
+
+  TSpecialValue = class(TObject)
+  public
+    Value: string;
+    Contagem: boolean;
+    constructor Create;
+  end;
+
+  THackButtonControl = class(TButtonControl)
+  public
+    property Checked;
+  end;
+
+  TSGSortCompareProc = function(SG: TStringGrid;
+    Col, Row1, Row2: integer): integer;
+
+  TDefValue = class(TComponent) // usada na função CloneRegistry
+  public
+    FieldName: string;
+    Value: Variant;
+    OnlyNullSource: boolean;
+    constructor Create(AOwner: TComponent; AFieldName: string; AValue: Variant;
+      AOnlyNullSource: boolean = false); reintroduce;
+  end;
+
+  TRGBArray = array [Word] of TRGBTriple;
+  pRGBArray = ^TRGBArray;
+
+procedure LoadCheckBox(Reg: TRegistry; CheckBox: TButtonControl; DefValue: boolean = false);
+
+implementation
+
+constructor TDefValue.Create(AOwner: TComponent; AFieldName: string;
+  AValue: Variant; AOnlyNullSource: boolean = false);
+begin
+  FieldName := AFieldName;
+  Value := AValue;
+  OnlyNullSource := AOnlyNullSource;
+  inherited Create(AOwner);
+end;
+
+{ TSpecialValue }
+
+constructor TSpecialValue.Create;
+begin
+  Contagem := false;
+end;
+
+procedure LoadCheckBox(Reg: TRegistry; CheckBox: TButtonControl; DefValue: boolean = false);
+var pQuery:TSamasROQuery;
+    ClassName:String;
+begin
+  if(CheckBox.Owner is TFormDB)then
+  begin
+    pQuery := (CheckBox.Owner as TFormDB).CreateQuery;
+    ClassName := CheckBox.Owner.Classname;
+  end else
+  begin
+    pQuery := nil;
+  end;
+  Try
+    if(Assigned(pQuery))then
+    begin
+
+    end;
+    if Reg.ValueExists(CheckBox.Name) then
+    begin
+      THackButtonControl(CheckBox).Checked := Reg.ReadBool(CheckBox.Name);
+    end
+    else
+    begin
+      THackButtonControl(CheckBox).Checked := DefValue;
+    end;
+  Finally
+    if(Assigned(pQuery))then
+    begin
+      pQuery.Free;
+    end;
+  End;
+end;
+
+
+end.
